@@ -6,16 +6,33 @@ using challenge.Models;
 
 namespace challenge.Controllers
 {
-    [Route("api/employee")]
-    public class EmployeeController : Controller
+    [Route("api/compensation")]
+    public class CompensationController : Controller
     {
         private readonly ILogger _logger;
-        private readonly IEmployeeService _employeeService;
+        private readonly ICompensationService _compensationService;
 
-        public EmployeeController(ILogger<EmployeeController> logger, IEmployeeService employeeService)
+        public CompensationController(ILogger<EmployeeController> logger, IEmployeeService employeeService)
         {
             _logger = logger;
             _employeeService = employeeService;
+        }
+
+        [HttpGet("{id}", Name = "getCompensationById")]
+        public IActionResult GetEmployeeById(String id)
+        {
+            _logger.LogDebug($"Received reporting structure GET request for '{id}'");
+
+            // Use recursive method to find num of people that report to the employee
+            int numReporters = GetReportersCount(id);
+
+            // Catch 404 not found
+            if (numReporters == -1)
+            {
+                return NotFound();
+            }
+
+            return Ok(numReporters);
         }
 
         [HttpPost]
@@ -41,18 +58,5 @@ namespace challenge.Controllers
             return Ok(employee);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult ReplaceEmployee(String id, [FromBody]Employee newEmployee)
-        {
-            _logger.LogDebug($"Recieved employee update request for '{id}'");
-
-            var existingEmployee = _employeeService.GetById(id);
-            if (existingEmployee == null)
-                return NotFound();
-
-            _employeeService.Replace(existingEmployee, newEmployee);
-
-            return Ok(newEmployee);
-        }
     }
 }

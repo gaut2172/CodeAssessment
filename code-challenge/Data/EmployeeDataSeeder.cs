@@ -1,5 +1,6 @@
 ﻿using challenge.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,57 +30,46 @@ namespace challenge.Data
             }
         }
 
+        /*
+         * Function to parse the JSON seed data into a list of Employee objects 
+         */
         private List<Employee> LoadEmployees()
         {
-            using (FileStream fs = new FileStream(EMPLOYEE_SEED_DATA_FILE, FileMode.Open))
-            using (StreamReader sr = new StreamReader(fs))
-            using (JsonReader jr = new JsonTextReader(sr))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                // Use Linq method to parse JSON seed data into a JObject
+                // I needed to edit the EmployeeSeedData.json file so that it was compatible
+                JObject jObject = JObject.Parse(File.ReadAllText(EMPLOYEE_SEED_DATA_FILE));
+                
+                List<Employee> employees = new List<Employee>();
 
-                List<Employee> employees = serializer.Deserialize<List<Employee>>(jr);
-                FixUpReferences(employees);
+                // for each employee in the JObject
+                foreach (var currEmployee in jObject["employees"])
+                {
+                    // create new C# Employee instance
+                    Employee newEmployee = new Employee(
+                        (string)currEmployee["employeeId"],
+                        (string)currEmployee["firstName"],
+                        (string)currEmployee["lastName"],
+                        (string)currEmployee["position"],
+                        (string)currEmployee["department"]);
+
+                    // if current employee has data in directReports property...
+                    if (currEmployee["directReports"] != null)
+                    {
+                        List<string> reporters = new List<string>();
+                        
+                        // add all employeeIds that report to current employee
+                        foreach (var currReporter in currEmployee["directReports"])
+                        {
+                            newEmployee.DirectReports.Add((string)currReporter["employeeId"]);
+                        }
+                    }
+
+                    employees.Add(newEmployee);
+                }
 
                 return employees;
             }
-        }
-
-        // Fixes Employee.DirectReports attribute for the given list of Employee objects
-        // param - employees - the list of Employees that was just deserialized from seed data
-        private void FixUpReferences(List<Employee> employees)
-        {
-            var employeeIdRefMap = from employee in employees
-                                select new { Id = employee.EmployeeId, EmployeeRef = employee };
-
-            
-            // for each employee in the seed data
-            employees.ForEach(employee =>
-            {
-                if (employee.DirectReports != null)
-                {
-                    Console.WriteLine("Heloooooo");
-
-                    // create list to hold current employee's reporters
-                    var referencedEmployees = new List<Employee>(employee.DirectReports.Count);
-
-                    // for each person that reports to current employee
-                    employee.DirectReports.ForEach(currReporter =>
-                    {
-                        
-                        var referencedEmployee = employeeIdRefMap.First(e => e.Id == currReporter.EmployeeId).EmployeeRef;
-                        if (referencedEmployee != null)
-                        {
-                            referencedEmployees.Add(referencedEmployee);
-                        }
-                    });
-                    employee.DirectReports = referencedEmployees;
-                    for (int i = 0; i < employee.DirectReports.Count; i++)
-                    {
-                        Console.WriteLine(employee.FirstName);
-                        Console.WriteLine(employee.DirectReports[i].EmployeeId);
-                    }
-                }
-            });
         }
     }
 }

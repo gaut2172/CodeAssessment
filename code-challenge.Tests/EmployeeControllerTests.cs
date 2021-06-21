@@ -14,6 +14,7 @@ using System.Net;
 using System.Net.Http;
 using code_challenge.Tests.Integration.Helpers;
 using System.Text;
+using System.Collections.Generic;
 
 namespace code_challenge.Tests.Integration
 {
@@ -43,14 +44,23 @@ namespace code_challenge.Tests.Integration
         [TestMethod]
         public void CreateEmployee_Returns_Created()
         {
+            // Set up
+            string expectedId = "ABCDEFG";
+            string expectedFirstName = "John";
+            string expectedLastName = "Goodman";
+            string expectedPos = "Actor";
+            string expectedDep = "Film";
+            List<string> expectedDirReports = new List<string>();
+            expectedDirReports.Add("16a596ae-edd3-4847-99fe-c4518e82c86f");
+            expectedDirReports.Add("b7839309-3348-463b-a7e3-5de1c168beb3");
+
             // Arrange
-            var employee = new Employee()
-            {
-                Department = "Complaints",
-                FirstName = "Debbie",
-                LastName = "Downer",
-                Position = "Receiver",
-            };
+            Employee employee = new Employee(
+                expectedId, 
+                expectedFirstName, 
+                expectedLastName, 
+                expectedPos,
+                expectedDep);
 
             var requestContent = new JsonSerialization().ToJson(employee);
 
@@ -64,10 +74,10 @@ namespace code_challenge.Tests.Integration
 
             var newEmployee = response.DeserializeContent<Employee>();
             Assert.IsNotNull(newEmployee.EmployeeId);
-            Assert.AreEqual(employee.FirstName, newEmployee.FirstName);
-            Assert.AreEqual(employee.LastName, newEmployee.LastName);
-            Assert.AreEqual(employee.Department, newEmployee.Department);
-            Assert.AreEqual(employee.Position, newEmployee.Position);
+            Assert.AreEqual(expectedFirstName, newEmployee.FirstName);
+            Assert.AreEqual(expectedLastName, newEmployee.LastName);
+            Assert.AreEqual(expectedDep, newEmployee.Department);
+            Assert.AreEqual(expectedPos, newEmployee.Position);
         }
 
         [TestMethod]
@@ -120,14 +130,13 @@ namespace code_challenge.Tests.Integration
         public void UpdateEmployee_Returns_NotFound()
         {
             // Arrange
-            var employee = new Employee()
-            {
-                EmployeeId = "Invalid_Id",
-                Department = "Music",
-                FirstName = "Sunny",
-                LastName = "Bono",
-                Position = "Singer/Song Writer",
-            };
+            Employee employee = new Employee(
+                "Invalid_Id",
+                "Sunny",
+                "Bono",
+                "Singer/Song Writer",
+                "Music");
+
             var requestContent = new JsonSerialization().ToJson(employee);
 
             // Execute
