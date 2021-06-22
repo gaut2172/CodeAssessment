@@ -1,0 +1,25 @@
+﻿{
+  "compensations": [
+
+    {
+      "employeeId": "b7839309-3348-463b-a7e3-5de1c168beb3",
+      "salary": "80000.00",
+      "effectiveDate": "2015-09-25T11:54:49.0000000"
+    },
+    {
+      "employeeId": "03aa1462-ffa9-4978-901b-7c001562cf6f",
+      "salary": "70000.00",
+      "effectiveDate": "1991-07-25T11:54:49.0000000"
+    },
+    {
+      "employeeId": "62c1084e-6e34-4630-93fd-9153afb65309",
+      "salary": "60000.00",
+      "effectiveDate": "2005-05-25T11:54:49.0000000"
+    },
+    {
+      "employeeId": "c0c2293d-16bd-4603-8e08-638a9d18b22c",
+      "salary": "50000.00",
+      "effectiveDate": "1985-05-25T11:54:49.0000000"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ namespace challenge.Repositories
 
         public Compensation Add(Compensation compensation)
         {
-            compensation.Employee = Guid.NewGuid().ToString();
+            compensation.CompensationId = Guid.NewGuid().ToString();
             _compensationContext.Compensations.Add(compensation);
             return compensation;
         }

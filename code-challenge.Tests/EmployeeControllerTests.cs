@@ -1,15 +1,10 @@
-using challenge.Controllers;
-using challenge.Data;
 using challenge.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using code_challenge.Tests.Integration.Extensions;
 
-using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using code_challenge.Tests.Integration.Helpers;

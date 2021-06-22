@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using challenge.Data;
 using Microsoft.EntityFrameworkCore;
 using challenge.Repositories;
@@ -31,42 +25,33 @@ namespace code_challenge
             {
                 options.UseInMemoryDatabase("EmployeeDB");
             });
-            services.AddScoped<IEmployeeRepository,EmployeeRespository>();
+            services.AddDbContext<CompensationContext>(options =>
+            {
+                options.UseInMemoryDatabase("CompensationDB");
+            });
+            services.AddScoped<IEmployeeRepository, EmployeeRespository>();
+            services.AddScoped<ICompensationRepository, CompensationRepository>();
             services.AddTransient<EmployeeDataSeeder>();
+            services.AddTransient<CompensationDataSeeder>();
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<ICompensationService, CompensationService>();
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, EmployeeDataSeeder seeder)
+        public void Configure(IApplicationBuilder app, 
+            IHostingEnvironment env, 
+            EmployeeDataSeeder employeeSeeder,
+            CompensationDataSeeder compensationSeeder)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                seeder.Seed().Wait();
+                employeeSeeder.Seed().Wait();
+                compensationSeeder.Seed().Wait();
             }
 
-            app.UseMvc(
-            /*
-             * routes =>
-        {
-            // for POST /api/employee
-            routes.MapRoute(
-                name: "postEmployee",
-                template: "{controller=Employee}/{action=CreateEmployee}");
-
-            // for GET /api/employee/{employeeId}
-            routes.MapRoute(
-                name: "getEmployeeById_",
-                template: "{controller=Employee}/{action=GetEmployeeById}");
-
-            // for PUT /api/employee/{employeeId}
-            routes.MapRoute(
-                name: "replaceEmployeeById",
-                template: "{controller=Employee}/{action=ReplaceEmployee}");
-        }
-            */
-        );
+            app.UseMvc();
         }
     }
 }

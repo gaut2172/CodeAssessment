@@ -10,8 +10,11 @@ namespace challenge.Data
 {
     public class EmployeeContext : DbContext
     {
-        // Overriding method that deals with the Employee.DirectReports attribute serialization. 
-        // Allows List<string> attribute in Employee class when using EF Core database
+        /* 
+         * Overriding method that deals with the Employee.DirectReports attribute serialization. 
+         * Allows List<string> attribute in Employee class when using EF Core database
+         * Required later version of Entity Framework Core -- version 2.1.14
+         */
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // the HasConversion() method required a later version of EF Core

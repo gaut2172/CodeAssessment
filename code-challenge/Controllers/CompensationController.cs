@@ -12,50 +12,36 @@ namespace challenge.Controllers
         private readonly ILogger _logger;
         private readonly ICompensationService _compensationService;
 
-        public CompensationController(ILogger<EmployeeController> logger, IEmployeeService employeeService)
+        public CompensationController(ILogger<CompensationController> logger, ICompensationService compensationService)
         {
             _logger = logger;
-            _employeeService = employeeService;
+            _compensationService = compensationService;
         }
 
         [HttpGet("{id}", Name = "getCompensationById")]
         public IActionResult GetEmployeeById(String id)
         {
-            _logger.LogDebug($"Received reporting structure GET request for '{id}'");
+            _logger.LogDebug($"Received compensation GET request for '{id}'");
 
-            // Use recursive method to find num of people that report to the employee
-            int numReporters = GetReportersCount(id);
+            Compensation compensation = _compensationService.GetById(id);
 
-            // Catch 404 not found
-            if (numReporters == -1)
-            {
+            if (compensation == null)
                 return NotFound();
-            }
 
-            return Ok(numReporters);
+            return Ok(compensation);
         }
 
         [HttpPost]
-        public IActionResult CreateEmployee([FromBody] Employee employee)
+        public IActionResult CreateCompensation([FromBody] Compensation compensation)
         {
-            _logger.LogDebug($"Received employee create request for '{employee.FirstName} {employee.LastName}'");
+            _logger.LogDebug($"Received compensation CREATE request for employeeId " +
+                $"'{compensation.Employee}', " +
+                $"salary: '{compensation.Salary}', " +
+                $"effective date: '{compensation.EffectiveDate}'");
 
-            _employeeService.Create(employee);
+            _compensationService.Create(compensation);
 
-            return CreatedAtRoute("getEmployeeById", new { id = employee.EmployeeId }, employee);
-        }
-
-        [HttpGet("{id}", Name = "getEmployeeById")]
-        public IActionResult GetEmployeeById(String id)
-        {
-            _logger.LogDebug($"Received employee get request for '{id}'");
-
-            var employee = _employeeService.GetById(id);
-
-            if (employee == null)
-                return NotFound();
-
-            return Ok(employee);
+            return CreatedAtRoute("getCompensationById", new { id = compensation.CompensationId }, compensation);
         }
 
     }
